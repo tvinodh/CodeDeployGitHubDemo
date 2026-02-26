@@ -1,71 +1,46 @@
 name: Publish a release
 
-
 on:
-
-    push:
-
-        tags:
-
-            - v* #version is cut
-
-
+  push:
+    tags:
+      - v*   # version is cut
 
 env:
-
-    NODE_VERSION: 12
-
-
+  NODE_VERSION: 12
 
 jobs:
-jobs:
-    build:
+  build:
+    runs-on: ubuntu-latest
 
-        runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: react-static-web-apps-auth
 
-        defaults:
+    environment:
+      name: dev
+      url: ${{ steps.create_release.outputs.html_url }}
 
-            run:
+    steps:
+      - uses: actions/checkout@v2
 
-                working-directory: react-static-web-apps-auth
-
-        environment:
-
-            name: dev
-
-            url: ${{ steps.create_release.outputs.html_url }}
-
-        steps:
-       - uses: actions/checkout@v2
-       - name: Create Release
-         id: create_release
-         uses: actions/create-release@v1
-
-      env:
-
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      with:
-
+        with:
           tag_name: ${{ github.ref }}
-
           release_name: Release ${{ github.ref }}
-
           draft: true
-
           prerelease: false
- - uses: actions/setup-node@v1
-  with:
 
-      node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-- run: |
-
-      npm ci
-
-      npm run lint
-
-      npm run build
-
-      npm pack      
-         
+      - name: Install, Lint, Build and Pack
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+          npm pack
