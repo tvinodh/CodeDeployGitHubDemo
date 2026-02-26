@@ -10,5 +10,4 @@ public class HomeController {
     String home() {
         return "Hello from GazGeek!";
     }
-
 }
